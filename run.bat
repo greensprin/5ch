@@ -1,5 +1,7 @@
 @echo off
 
+call .env\Scripts\activate
+
 :: 稼働中
 :: set URL=https://itest.5ch.net/hayabusa9/test/read.cgi/mnewsplus/1723666514
 
