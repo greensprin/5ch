@@ -1,7 +1,10 @@
 import re
 from collections import defaultdict
 import random
-import spacy
+import shutil
+# import spacy
+import datetime
+import pyperclip
 
 # 0: 1レス目のIDに対して必ずずんだもんを設定, 1: ランダムでキャラクター設定
 RANDOM_CHARACTER_MODE = 1
@@ -13,6 +16,9 @@ SELECT_ANCHER_NUM = 0 # いくつレスポンスがついているものを残�
 SEPARATE_SENTENCE_EN = 0
 
 PRE_CHARACTER_ID = -1
+
+# クリップボードをペーストする
+CLIPBORAD_PASTE_EN = 1
 
 def randint_nodup(start, end, pre_val):
     while(True):
@@ -43,7 +49,10 @@ def write_comment(f, thread_dict, key, thread_main_id):
                 id      = thread_dict[key]["id"] 
                 comment = thread_dict[key]["comment"]
 
-                if (RANDOM_CHARACTER_MODE == 0):
+                if (len(character_list) == 1):
+                    character_id = 0
+                    character = character_list[0]
+                elif (RANDOM_CHARACTER_MODE == 0):
                     character_id = randint_nodup(1, len(character_list) - 1, PRE_CHARACTER_ID)
                     character = "ずんだもん" if (thread_main_id == id) else character_list[character_id]
                 else:
@@ -55,12 +64,13 @@ def write_comment(f, thread_dict, key, thread_main_id):
 
                 # f.write(f'{character},{comment}\n')
 
-                if (SEPARATE_SENTENCE_EN == 1):
-                    doc = nlp(comment)
-                    for sent in doc.sents:
-                        f.write(f'{character},{sent.text}\n')
-                else:
-                    f.write(f'{character},{comment}\n')
+                # if (SEPARATE_SENTENCE_EN == 1):
+                #     doc = nlp(comment)
+                #     for sent in doc.sents:
+                #         f.write(f'{character},{sent.text}\n')
+                # else:
+                #     f.write(f'{character},{comment}\n')
+                f.write(f'{character},{comment}\n')
             else:
                 res_num = thread_dict[key]["response"][i-1]
                 write_comment(f, thread_dict, res_num, thread_main_id)
@@ -70,6 +80,12 @@ def write_comment(f, thread_dict, key, thread_main_id):
         return 0
 
 if __name__ == "__main__":
+    # matomex.htmlにクリップボードの内容コピー
+    if (CLIPBORAD_PASTE_EN == 1):
+        with open("input/matomex.html", "w", encoding="utf-8", errors="ignore", newline="") as f:
+            paste_str = pyperclip.paste()
+            f.write(paste_str)
+
     # ID, コメント取得
     thread_dict = {}
     with open("input/matomex.html", "r", encoding="utf-8", errors="ignore") as f:
@@ -102,15 +118,24 @@ if __name__ == "__main__":
 
                 # アンカー対策
                 # line = re.sub("\&gt\;", "<", line) # アンカーを残す
-                line = re.sub("\&gt\;\&gt\;([0-9]*)?", ">>", line) # アンカーを消す
+                # line = re.sub("\&gt\;\&gt\;([0-9]*)?", ">>", line) # アンカーを消す
+                line = re.sub("\&gt\;\&gt\;([0-9]*)?", "", line) # 何も残さない
 
                 # 空白など削除
                 line = re.sub("\s", "", line)
 
+                # <br/>を空白に変更
+                line = re.sub(r"<br/>", r"\n　", line)
+
                 # HTMLタグ削除
                 comment = re.sub("\<.*?\>", "", line)
 
-                thread_dict[res_num]["comment"] = comment
+                # アンカー後ろの全角空白は削除する
+                comment = re.sub(r"(?<=>>)\n", "", comment)
+                comment = re.sub(r"\n　$", "", comment)
+                comment = re.sub(r"\n　(\n　)+", "\n", comment)
+
+                thread_dict[res_num]["comment"] = f'"{comment}"'
 
                 if (ancher != None and AUTO_DAIHON_EN != 0):
                     ancher = ancher.group()
@@ -122,16 +147,23 @@ if __name__ == "__main__":
 
                     thread_dict[res_num]["ancher_flag"] = 1
 
-    # 文章区切り
-    nlp = spacy.load("ja_ginza_electra")
+    # # 文章区切り
+    # if (SEPARATE_SENTENCE_EN == 1):
+    #     nlp = spacy.load("ja_ginza_electra")
+    # else:
+    #     nlp = None
 
     # 台本作成
     character_list = [
         # "ずんだもん",
-        "四国めたん",
-        "春日部つむぎ",
+        # "四国めたん",
+        # "春日部つむぎ",
         # "青山龍星",
-        "もち子さん",
+        # "もち子さん",
+        # "雨晴はう",
+        "つむぎ_00",
+        # "つむぎ_2",
+        # "ひまり_2",
     ]
     with open("output/daihon.csv", "w", encoding="cp932", errors="ignore") as f:
         for i, key in enumerate(thread_dict):
@@ -146,3 +178,10 @@ if __name__ == "__main__":
 
             if (res == 1):
                 f.write("\n")
+
+    # 結果をコピー
+    dt = datetime.date.today().strftime("%Y%m%d")
+    out_dirname = f"{dt}_"
+    output_dir = "C:\work\movie\Project"
+    shutil.copytree(f"{output_dir}/zz_template", f"{output_dir}/{out_dirname}")
+    shutil.copy(f"output/daihon.csv", f"{output_dir}/{out_dirname}/daihon.csv")
