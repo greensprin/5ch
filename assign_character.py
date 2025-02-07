@@ -1,5 +1,11 @@
 import random
 import shutil
+import yaml
+
+def load_yaml(file_path):
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+    return config
 
 def randint_nodup(start, end, pre_val):
     while(True):
@@ -10,6 +16,9 @@ def randint_nodup(start, end, pre_val):
     return val
 
 def main():
+    # 設定読み込み
+    config = load_yaml("settings\setting.yaml")
+
     character_list = [
         # "ずんだもん",
         "四国めたん",
@@ -29,7 +38,7 @@ def main():
             pre_character_id = character_id
 
     # 結果をコピー
-    output_dir = "C:\work\movie\Project"
+    output_dir = config["out_dir"]
     shutil.copytree(f"{output_dir}/zz_template", f"{output_dir}/tmp")
     shutil.copy(f"output/daihon.csv", f"{output_dir}/tmp/daihon.csv")
 
