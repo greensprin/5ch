@@ -5,6 +5,7 @@ import shutil
 # import spacy
 import datetime
 import pyperclip
+import yaml
 
 # 0: 1レス目のIDに対して必ずずんだもんを設定, 1: ランダムでキャラクター設定
 RANDOM_CHARACTER_MODE = 1
@@ -19,6 +20,11 @@ PRE_CHARACTER_ID = -1
 
 # クリップボードをペーストする
 CLIPBORAD_PASTE_EN = 1
+
+def load_yaml(file_path):
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+    return config
 
 def randint_nodup(start, end, pre_val):
     while(True):
@@ -80,6 +86,9 @@ def write_comment(f, thread_dict, key, thread_main_id):
         return 0
 
 if __name__ == "__main__":
+    # 設定読み込み
+    config = load_yaml("settings\setting.yaml")
+
     # matomex.htmlにクリップボードの内容コピー
     if (CLIPBORAD_PASTE_EN == 1):
         with open("input/matomex.html", "w", encoding="utf-8", errors="ignore", newline="") as f:
@@ -182,6 +191,6 @@ if __name__ == "__main__":
     # 結果をコピー
     dt = datetime.date.today().strftime("%Y%m%d")
     out_dirname = f"{dt}_"
-    output_dir = "C:\work\movie\Project"
+    output_dir = config["out_dir"]
     shutil.copytree(f"{output_dir}/zz_template", f"{output_dir}/{out_dirname}")
     shutil.copy(f"output/daihon.csv", f"{output_dir}/{out_dirname}/daihon.csv")
