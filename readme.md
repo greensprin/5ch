@@ -56,7 +56,7 @@
         # windows
         .env\Scripts\activate
         # mac
-        .env/bin/activate
+        source .env/bin/activate
         ```
     1. 仮想環境にライブラリをインストールする
         ```shell
@@ -108,3 +108,14 @@
     - 読み上げの長さに他のオブジェクトを合わせる
     - 読み上げの字幕を非表示にする
 1. 全体を通して動画をチェックする
+
+## macでYMM4を動かす方法
+
+- [parallels](https://www.parallels.com/jp/products/desktop/)をインストールする
+    - 無償で14日間使用可能
+    - 移行はプランによりお金がかかる
+    - parallelsをインストール後、windows11を入れる
+    - 古いmacだったら他の方法でもできるかも (windows公式はparallelsのみ)
+- windowsライセンスを購入
+    - parallelsを購入しても、windowsのライセンスはついていないのでこちらを購入する必要がある
+    - amazonで調べたら購入できる

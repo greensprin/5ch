@@ -87,7 +87,7 @@ def write_comment(f, thread_dict, key, thread_main_id):
 
 if __name__ == "__main__":
     # 設定読み込み
-    config = load_yaml("settings\setting.yaml")
+    config = load_yaml("settings/setting.yaml")
 
     # matomex.htmlにクリップボードの内容コピー
     if (CLIPBORAD_PASTE_EN == 1):
