@@ -56,7 +56,7 @@
         # windows
         .env\Scripts\activate
         # mac
-        .env/bin/activate
+        source .env/bin/activate
         ```
     1. 仮想環境にライブラリをインストールする
         ```shell
